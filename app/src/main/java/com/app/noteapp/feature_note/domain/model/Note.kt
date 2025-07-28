@@ -20,3 +20,6 @@ data class Note(
         val noteColors = listOf(RedOrange, LightGreen, Violet, BabyBlue, RedPink)
     }
 }
+
+
+class InvalidNotesException(message: String) : Exception(message)
