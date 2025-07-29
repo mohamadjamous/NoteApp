@@ -7,17 +7,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -48,16 +41,14 @@ fun AddEditNoteScreen(
             Color(if (noteColor != -1) noteColor else viewModel.noteColor.value)
         )
     }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is AddEditNoteViewModel.UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = event.message
-                    )
+            when (event) {
+                is AddEditNoteViewModel.UiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(message = event.message)
                 }
+
                 is AddEditNoteViewModel.UiEvent.SaveNote -> {
                     navController.navigateUp()
                 }
@@ -71,17 +62,18 @@ fun AddEditNoteScreen(
                 onClick = {
                     viewModel.onEvent(AddEditNoteEvent.SaveNote)
                 },
-                backgroundColor = MaterialTheme.colors.primary
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save note")
             }
         },
-        scaffoldState = scaffoldState
-    ) {
+        snackbarHost = { SnackbarHost(snackBarHostState) }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(noteBackgroundAnimatable.value)
+                .padding(innerPadding)
                 .padding(16.dp)
         ) {
             Row(
@@ -109,9 +101,7 @@ fun AddEditNoteScreen(
                                 scope.launch {
                                     noteBackgroundAnimatable.animateTo(
                                         targetValue = Color(colorInt),
-                                        animationSpec = tween(
-                                            durationMillis = 500
-                                        )
+                                        animationSpec = tween(durationMillis = 500)
                                     )
                                 }
                                 viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
@@ -119,7 +109,9 @@ fun AddEditNoteScreen(
                     )
                 }
             }
+
             Spacer(modifier = Modifier.height(16.dp))
+
             TransparentHintTextField(
                 text = titleState.text,
                 hint = titleState.hint,
@@ -133,7 +125,9 @@ fun AddEditNoteScreen(
                 singleLine = true,
                 textStyle = MaterialTheme.typography.headlineLarge
             )
+
             Spacer(modifier = Modifier.height(16.dp))
+
             TransparentHintTextField(
                 text = contentState.text,
                 hint = contentState.hint,
