@@ -43,6 +43,7 @@ fun NotesScreen(
     val scope = rememberCoroutineScope()
 
     Scaffold(
+        modifier = modifier,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -55,9 +56,8 @@ fun NotesScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
-        },
-
-        ) { paddingValues ->
+        }
+    ) { paddingValues ->
 
         Column(
             modifier = Modifier
